@@ -74,8 +74,8 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
     {
         Serial.println("Delivery fail");
     }
-
 #endif
+
     gotoSleep();
 }
 
@@ -206,4 +206,6 @@ void setup()
     sendReading(); // send initial state when booted
 }
 
-void loop() {}
+void loop()
+{
+}
