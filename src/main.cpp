@@ -56,7 +56,8 @@ void gotoSleep()
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
 {
 #ifdef DEBUG_FLAG
-    Serial.print(sendStatus);
+    Serial.print("sendStatus: ");
+    Serial.println(sendStatus);
     if (sendStatus == 0)
     {
         char mac_recv[18];
@@ -82,7 +83,7 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
 void sendReading()
 {
     String msgStr;
-    StaticJsonDocument<300> msgJson;
+    StaticJsonDocument<256> msgJson;
 
     msgJson["group_id"] = GROUP_ID;
     sprintf(macAddr, "%02X%02X%02X%02X%02X%02X", macAddr_int[0], macAddr_int[1], macAddr_int[2], macAddr_int[3], macAddr_int[4], macAddr_int[5]);
@@ -95,7 +96,7 @@ void sendReading()
     Serial.println(msgStr.length());
     Serial.println(msgStr);
 #endif
-    esp_now_send(broadcastAddress, (uint8_t *)&msgStr, msgStr.length());
+    esp_now_send(broadcastAddress, (uint8_t *)&msgStr, msgStr.length()); // max is 256
 }
 
 void newReading()
@@ -103,7 +104,7 @@ void newReading()
 
 // TURN ON
 #ifdef DEBUG_FLAG
-    String debug = "New Reading\n";
+    String debug = "New\n";
     Serial.println("New read...");
 #endif
     digitalWrite(OUTPUT_VCC, HIGH);
@@ -114,7 +115,7 @@ void newReading()
     digitalWrite(S0, LOW);
     float battery_raw = analogRead(ADC_PIN) / 1024.f;
 #ifdef DEBUG_FLAG
-    debug += "battery_raw: " + String(battery_raw) + "\n";
+    debug += "b_raw: " + String(battery_raw) + "\n";
     Serial.print("Voltage measured: ");
     Serial.println(battery_raw);
 #endif
@@ -126,7 +127,7 @@ void newReading()
     - 0.616 -> 3.17
     */
 #ifdef DEBUG_FLAG
-    debug += "battery_calculated " + String(battery_raw) + "\n";
+    debug += "b_calc " + String(battery_raw) + "\n";
     Serial.print("Voltage val: ");
     Serial.println(battery_raw);
 #endif
@@ -136,13 +137,13 @@ void newReading()
     digitalWrite(S0, HIGH);
     float moisture_raw = analogRead(ADC_PIN) / 1024.f;
 #ifdef DEBUG_FLAG
-    debug += "moisture_raw " + String(moisture_raw) + "\n";
+    debug += "m_raw " + String(moisture_raw) + "\n";
     Serial.print("Moisture measured: ");
     Serial.println(moisture_raw);
 #endif
     int moisture_calculated = map(moisture_raw * 100, moisture_max * 100, moisture_min * 100, 0, 100);
 #ifdef DEBUG_FLAG
-    debug += "moisture_calculated: " + String(moisture_calculated) + " (raw*100: " + String(long(moisture_raw * 100)) + " min*100: " + String(long(moisture_min * 100)) + ", max*100: " + String(long(moisture_max * 100)) + ", 0 -> 100)\n";
+    debug += "m_calc: " + String(moisture_calculated) + " (raw*100: " + String(long(moisture_raw * 100)) + " min*100: " + String(long(moisture_min * 100)) + ", max*100: " + String(long(moisture_max * 100)) + ", 0 -> 100)\n";
     Serial.print("Mapped moisture val: ");
     Serial.println(moisture_calculated);
 #endif
