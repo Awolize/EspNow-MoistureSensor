@@ -1,10 +1,22 @@
 # EspNow-MoistureSensor
 
-This is a simple ESP-Now project, where moisture and battery levels are measured and sent to an ESP-Now receiver (hub). The ESP-Now data is in JSON format.
+This is a simple ESP-Now project
 
-I myself used an ESP8266 (d1 mini).
+Measures:
+* Battery
+* Moisture Level
 
-This project has been built with battery power in mind.
+Power Source:
+* Battery
+
+Protocol:
+* ESP-Now (JSON)
+
+Hardware:
+* Esp8266 (D1 mini)
+* Analog multiplexer
+* Capacitive soil moisture sensor
+
 
 
 The code for the receiver has been uploaded to another repo.
