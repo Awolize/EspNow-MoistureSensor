@@ -1,6 +1,7 @@
 # EspNow-MoistureSensor
 
-This is a simple EspNow project, where mostirure and battery level is measured and sent to a espnow reciever (hub).
+This is a simple ESP-Now project, where moisture and battery levels are measured and sent to an ESP-Now receiver (hub).
 
-Using JSON to send the data.
-Me myself used a esp8266 (d1 mini)
+The data is in JSON format.
+
+I myself used a esp8266 (d1 mini).
