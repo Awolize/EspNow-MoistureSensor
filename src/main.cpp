@@ -29,7 +29,7 @@
 uint8_t broadcastAddress[] = {0x24, 0xA1, 0x60, 0x3A, 0xD1, 0xD1};
 
 // Globals Internal
-StaticJsonDocument<300> doc;
+StaticJsonDocument<256> doc;
 
 uint8_t macAddr_int[6];
 char macAddr[18];
