@@ -71,7 +71,10 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
         Serial.println();
     }
     else
+    {
         Serial.println("Delivery fail");
+    }
+
 #endif
     gotoSleep();
 }
