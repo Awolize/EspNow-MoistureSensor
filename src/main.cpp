@@ -12,7 +12,8 @@
 #define moisture_max 0.80
 #define moisture_min 0.30
 
-#define DEBUG_FLAG
+// Uncomment to get debug prints, both serial and ESP-Now
+// #define DEBUG_FLAG
 
 // Selectors
 #define S0 14 // GPIO14
@@ -49,7 +50,7 @@ void gotoSleep()
     Serial.println(currentmillis);
 #endif
 
-    delay(10);
+    delay(2);
     ESP.deepSleep(3.6e9); // deep sleep
 }
 
@@ -96,7 +97,8 @@ void sendReading()
     Serial.println(msgStr.length());
     Serial.println(msgStr);
 #endif
-    esp_now_send(broadcastAddress, (uint8_t *)&msgStr, msgStr.length()); // max is 256
+
+    esp_now_send(broadcastAddress, (uint8_t *)msgStr.c_str(), msgStr.length()); // max size is 256
 }
 
 void newReading()
@@ -207,6 +209,4 @@ void setup()
     sendReading(); // send initial state when booted
 }
 
-void loop()
-{
-}
+void loop() {}
