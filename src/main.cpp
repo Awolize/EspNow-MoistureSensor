@@ -24,7 +24,9 @@
 #define MOISTURE_VCC 00 // GPIO0
 #define OUTPUT_VCC 05   // GPIO5
 #define OUTPUT_Ebar 04  // GPIO4
+#define DONE 15         // GPIO15
 #define ADC_PIN 0       // A0
+// #define LED_BUILTIN 02  // D4
 
 #define GROUP_ID 855544
 uint8_t broadcastAddress[] = {0x24, 0xA1, 0x60, 0x3A, 0xD1, 0xD1};
@@ -50,27 +52,29 @@ void gotoSleep()
     Serial.println(currentmillis);
 #endif
 
-    delay(2);
-    ESP.deepSleep(3.6e9); // deep sleep
+    delay(5);
+    digitalWrite(DONE, HIGH);
+    // ESP.deepSleep(3.6e9); // deep sleep
 }
 
-void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
+void onDataSent(uint8_t *mac_addr, uint8_t sendStatus)
 {
 #ifdef DEBUG_FLAG
     Serial.print("sendStatus: ");
     Serial.println(sendStatus);
     if (sendStatus == 0)
     {
-        char mac_recv[18];
-        sprintf(mac_recv, "%02X%02X%02X%02X%02X%02X", mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+        // this might do something illegal, something crashed the ESP and now it doesnt
+        // char mac_recv[18];
+        // sprintf(mac_recv, "%02X%02X%02X%02X%02X%02X", mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 
-        Serial.print("Mac addr of recipient: ");
-        Serial.print(mac_recv);
-        String msgStr;
-        serializeJson(doc, msgStr);
-        Serial.print(" status: ");
-        Serial.print(msgStr);
-        Serial.println();
+        // Serial.print("Mac addr of recipient: ");
+        // Serial.print(mac_recv);
+        // String msgStr;
+        // serializeJson(doc, msgStr);
+        // Serial.print(" status: ");
+        // Serial.print(msgStr);
+        // Serial.println();
     }
     else
     {
@@ -94,6 +98,8 @@ void sendReading()
 
     serializeJson(msgJson, msgStr);
 #ifdef DEBUG_FLAG
+
+    Serial.println("Sending message:");
     Serial.println(msgStr.length());
     Serial.println(msgStr);
 #endif
@@ -176,6 +182,7 @@ void setup()
     pinMode(MOISTURE_VCC, OUTPUT); // moisture vcc
     pinMode(OUTPUT_VCC, OUTPUT);   // VCC
     pinMode(OUTPUT_Ebar, OUTPUT);  // Enable
+    pinMode(DONE, OUTPUT);         // Done
 
     pinMode(S0, OUTPUT); // S0
     pinMode(S1, OUTPUT); // S1
@@ -184,6 +191,7 @@ void setup()
     digitalWrite(MOISTURE_VCC, HIGH);
     digitalWrite(OUTPUT_VCC, HIGH);
     digitalWrite(OUTPUT_Ebar, LOW);
+    digitalWrite(DONE, LOW);
 
     digitalWrite(S0, LOW);
     digitalWrite(S1, LOW);
@@ -199,14 +207,20 @@ void setup()
         ESP.restart();
     }
     esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER);
-    esp_now_register_send_cb(OnDataSent);
+    esp_now_register_send_cb(onDataSent);
     esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
 
     WiFi.macAddress(macAddr_int);
     sprintf(macAddr, "%02X%02X%02X%02X%02X%02X", macAddr_int[0], macAddr_int[1], macAddr_int[2], macAddr_int[3], macAddr_int[4], macAddr_int[5]);
-
-    newReading();
-    sendReading(); // send initial state when booted
 }
 
-void loop() {}
+bool sent = false;
+void loop()
+{
+    if (!sent)
+    {
+        newReading();
+        sendReading(); // send initial state when booted
+        sent = true;
+    }
+}
